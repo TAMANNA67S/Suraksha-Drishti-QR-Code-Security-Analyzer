@@ -1,5 +1,4 @@
-# url_analyzer.py — Advanced URL Feature Extraction
-# LOCATION: app/url_analyzer.py
+
 import re
 import socket
 import ssl
@@ -11,9 +10,6 @@ from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
-# =========================
-# CONFIGURATION
-# =========================
 SUSPICIOUS_KEYWORDS = [
     'login', 'verify', 'payment', 'bank', 'update', 'account',
     'otp', 'reward', 'gift', 'free', 'secure', 'confirm', 'signin',
@@ -28,9 +24,6 @@ SHORTENING_SERVICES = [
 TYPOSQUAT_CHARS = {'0': 'o', '1': 'l', '3': 'e', '5': 's', '@': 'a', '4': 'a'}
 
 
-# =========================
-# FEATURE HELPERS
-# =========================
 def is_typosquatted(domain: str) -> bool:
     """Detects common character substitutions used in typosquatting."""
     return any(ch in domain for ch in TYPOSQUAT_CHARS)
@@ -47,25 +40,14 @@ def get_domain_age(domain: str) -> int:
     """
 
     try:
-
-        # Ab 'import whois' yaha karne ki zaroorat nahi hai
-
         w = whois.whois(domain)
-
         creation = w.creation_date
-
         if isinstance(creation, list):
-
             creation = creation[0]
-
         if creation and isinstance(creation, datetime):
-
             return (datetime.now() - creation).days
-
     except Exception as e:
-
         logger.debug(f"WHOIS error for {domain}: {e}")
-
     return -1
 
 def check_ssl_certificate(domain: str) -> bool:
@@ -92,9 +74,7 @@ def check_url_reputation(url: str) -> str:
         logger.debug(f"Reputation check error for {url}: {e}")
         return "Unreachable"
 
-# =========================
-# MAIN FEATURE EXTRACTION
-# =========================
+
 def extract_features(url: str) -> dict:
     """
     Analyses a URL and returns a comprehensive security feature dict.
@@ -103,7 +83,7 @@ def extract_features(url: str) -> dict:
     try:
         safe_url = url if "://" in url else f"http://{url}"
         parsed = urlparse(safe_url)
-        domain = parsed.netloc.lower().split(':')[0]  # strip port if present
+        domain = parsed.netloc.lower().split(':')[0]  
 
         domain_parts = [p for p in domain.split('.') if p]
         num_subdomains = max(0, len(domain_parts) - 2)
