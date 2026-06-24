@@ -1,8 +1,4 @@
-# pdf_generator.py — Extended Branded PDF Generator
-# LOCATION: app/pdf_generator.py
-# NOTE: reports.py (generate_report) is the function imported by main.py.
-#       This module provides the advanced multi-section report used for
-#       the "Download Full Report" button in the dashboard.
+
 import logging
 from pathlib import Path
 from datetime import datetime
@@ -88,17 +84,17 @@ def generate_pdf_report(
         pdf = SecurityReport()
         pdf.add_page()
 
-        # ── Scan Overview ──────────────────────────────────────────────
+
         pdf.chapter_title("Scan Overview")
         pdf.body_text(f"Timestamp : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         pdf.body_text(f"URL       : {url}")
         pdf.ln(4)
 
-        # ── Risk Badge ────────────────────────────────────────────────
+        
         pdf.chapter_title("Risk Assessment")
         pdf.risk_badge(risk_score, risk_category)
 
-        # ── Findings ─────────────────────────────────────────────────
+        
         pdf.chapter_title("Identified Risk Factors")
         if reasons:
             for r in reasons:
@@ -107,7 +103,6 @@ def generate_pdf_report(
             pdf.body_text("No suspicious indicators detected.")
         pdf.ln(4)
 
-        # ── Recommendations ───────────────────────────────────────────
         pdf.chapter_title("Security Recommendations")
         for rec in recommendations:
             pdf.body_text(f"• {rec}")
