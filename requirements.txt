@@ -1,26 +1,10 @@
 
-
-# Core UI
 streamlit==1.39.0
-
-# Data
 pandas==2.2.3
-numpy==1.26.4           # numpy 2.x breaks opencv-python on some platforms
-
-# Computer Vision / QR
+numpy==1.26.4           
 opencv-python==4.10.0.84
 Pillow==10.4.0
-
-# Charts
 plotly==5.24.1
-
-# PDF Generation
-# IMPORTANT: use fpdf2 (not legacy fpdf==1.7.2)
-# fpdf2 is the maintained fork; it is imported as "from fpdf import FPDF"
 fpdf2==2.7.9
-
-# Networking / URL analysis
 requests==2.32.3
-
-# WHOIS (optional — graceful fallback if absent)
 python-whois==0.8.0
