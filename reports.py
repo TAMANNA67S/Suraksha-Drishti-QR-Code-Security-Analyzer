@@ -1,5 +1,3 @@
-# reports.py — Professional PDF Report Generator
-# LOCATION: app/reports.py  ← must be in same folder as main.py
 
 import logging
 from pathlib import Path
@@ -7,23 +5,16 @@ from datetime import datetime
 from fpdf import FPDF
 
 logger = logging.getLogger(__name__)
-
-# =========================
-# REPORT DIRECTORY (resolves to project_root/reports/)
-# =========================
 REPORT_DIR = Path(__file__).parent.parent / "reports"
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# =========================
-# CUSTOM PDF CLASS
-# =========================
 class PDFReport(FPDF):
     """Branded PDF with dark-navy header and cyber-blue accents."""
 
     def header(self):
-        self.set_fill_color(10, 15, 31)       # Dark Navy
-        self.set_text_color(0, 255, 255)      # Cyber Blue
+        self.set_fill_color(10, 15, 31)    
+        self.set_text_color(0, 255, 255)      
         self.set_font("Arial", "B", 14)
         self.cell(0, 12, "SURAKSHA DRISHTI — Security Analysis Report",
                   ln=True, align="C", fill=True)
@@ -53,11 +44,11 @@ class PDFReport(FPDF):
 
     def colored_score(self, risk_score: int, risk_category: str):
         if risk_score <= 30:
-            self.set_text_color(0, 180, 0)       # Green
+            self.set_text_color(0, 180, 0)       
         elif risk_score <= 60:
-            self.set_text_color(220, 150, 0)     # Amber
+            self.set_text_color(220, 150, 0)  
         else:
-            self.set_text_color(200, 0, 0)       # Red
+            self.set_text_color(200, 0, 0)       
         self.set_font("Arial", "B", 13)
         self.cell(0, 10,
                   f"Risk Score: {risk_score}/100  |  Category: {risk_category}",
@@ -67,9 +58,6 @@ class PDFReport(FPDF):
         self.ln(3)
 
 
-# =========================
-# PUBLIC API — called from main.py
-# =========================
 def generate_report(scan_data: dict, filename: str = None) -> str:
     """
     Generates a PDF security report from scan_data dict.
@@ -84,13 +72,13 @@ def generate_report(scan_data: dict, filename: str = None) -> str:
         pdf = PDFReport()
         pdf.add_page()
 
-        # ── Scan Overview ──────────────────────────────────────────────
+       
         pdf.section_title("  Scan Overview")
         pdf.body_line(f"Timestamp : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         pdf.body_line(f"URL       : {scan_data.get('url', 'N/A')}")
         pdf.ln(3)
 
-        # ── Risk Score ────────────────────────────────────────────────
+ 
         pdf.section_title("  Risk Assessment")
         pdf.colored_score(
             scan_data.get("risk_score", 0),
@@ -107,7 +95,7 @@ def generate_report(scan_data: dict, filename: str = None) -> str:
             pdf.body_line("  No suspicious indicators detected.")
         pdf.ln(4)
 
-        # ── Recommendations ───────────────────────────────────────────
+      
         pdf.section_title("  Security Recommendations")
         recommendations = [
             "Avoid clicking URLs from unknown or untrusted QR codes.",
