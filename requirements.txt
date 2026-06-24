@@ -1,8 +1,4 @@
-# ──────────────────────────────────────────────────────
-# SURAKSHA DRISHTI — requirements.txt
-# Python : 3.11.x  (3.12+ NOT supported — opencv/fpdf issues)
-# Install: pip install -r requirements.txt
-# ──────────────────────────────────────────────────────
+
 
 # Core UI
 streamlit==1.39.0
