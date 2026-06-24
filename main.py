@@ -1,12 +1,4 @@
-# main.py — SURAKSHA DRISHTI | Premium Cybersecurity Dashboard
-# LOCATION: app/main.py
-#
-# HOW TO RUN (from project root  →  SURAKSHA DRISHTI/):
-#   streamlit run app/main.py
-#
-# ──────────────────────────────────────────────────────────────
-# ALL IMPORTS ARE FROM THE SAME app/ PACKAGE — NO ModuleNotFoundError
-# ──────────────────────────────────────────────────────────────
+
 import sys
 import os
 import tempfile
@@ -22,29 +14,22 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-# Ensure app/ is on sys.path regardless of working directory
 APP_DIR = Path(__file__).parent
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-# ── Local imports (all live in app/) ──────────────────────────
-from qr_scanner  import scan_qr                                    # noqa: E402
-from risk_engine import analyze_url                                 # noqa: E402
-from database    import create_database, insert_scan, get_all_scans, delete_all_scans  # noqa: E402
-from reports     import generate_report                             # noqa: E402
-from pdf_generator import generate_pdf_report                       # noqa: E402
-
+from qr_scanner  import scan_qr                                   
+from risk_engine import analyze_url
+from database    import create_database, insert_scan, get_all_scans, delete_all_scans  
+from reports     import generate_report                           
+from pdf_generator import generate_pdf_report                   
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# =========================
-# DB INIT (runs once)
-# =========================
+
 create_database()
 
-# =========================
-# PAGE CONFIG
-# =========================
+
 st.set_page_config(
     page_title="Suraksha Drishti",
     page_icon="🛡️",
@@ -52,9 +37,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# =========================
-# GLOBAL CSS — Dark Glassmorphism SaaS Theme
-# =========================
+
 st.markdown("""
 <style>
 /* ── Base ─────────────────────────────────────────────── */
@@ -213,9 +196,7 @@ input[type="text"] {
 """, unsafe_allow_html=True)
 
 
-# =========================
-# HELPERS
-# =========================
+
 def risk_color(category: str) -> str:
     return {"Safe": "#00e676", "Moderate": "#ffb300", "Dangerous": "#ff3d3d"}.get(category, "#aaa")
 
@@ -229,9 +210,6 @@ def score_color(score: int) -> str:
     return "#ff3d3d"
 
 
-# =========================
-# SIDEBAR
-# =========================
 with st.sidebar:
     st.markdown("""
     <div style='text-align:center; padding: 20px 0 10px 0;'>
@@ -259,9 +237,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 
-# =========================
-# SHARED RENDER FUNCTION
-# =========================
+
 def _render_analysis(url: str):
     """Analyses a URL and renders the full result card."""
     with st.spinner(f"Analysing {url[:60]}…"):
@@ -273,7 +249,7 @@ def _render_analysis(url: str):
     category = result["risk_category"]
     reasons  = result.get("reasons", [])
 
-    # Score ring
+
     st.markdown(f"""
     <div class="glass-card">
         <div class="score-ring-wrap">
@@ -284,7 +260,7 @@ def _render_analysis(url: str):
     </div>
     """, unsafe_allow_html=True)
 
-    # Gauge chart
+  
     fig_gauge = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
@@ -311,7 +287,6 @@ def _render_analysis(url: str):
     )
     st.plotly_chart(fig_gauge, use_container_width=True)
 
-    # Reasons
     with st.expander("⚠️ Risk Factors Detected", expanded=True):
         if reasons:
             for r in reasons:
@@ -319,7 +294,7 @@ def _render_analysis(url: str):
         else:
             st.success("✅ No suspicious indicators found.")
 
-    # Recommendations
+   
     with st.expander("🛡️ Security Recommendations"):
         for rec in [
             "Verify this domain before entering credentials.",
@@ -329,7 +304,6 @@ def _render_analysis(url: str):
         ]:
             st.markdown(f"• {rec}")
 
-    # PDF download
     pdf_path = generate_report(result)
     if pdf_path and Path(pdf_path).exists():
         with open(pdf_path, "rb") as f:
@@ -342,9 +316,6 @@ def _render_analysis(url: str):
             )
 
 
-# =========================
-# PAGE: SCAN QR CODE
-# =========================
 if page == "🔍 Scan QR Code":
 
     st.markdown("""
@@ -372,7 +343,7 @@ if page == "🔍 Scan QR Code":
             st.image(uploaded_file, caption="Uploaded QR Code", use_column_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # Manual URL entry
+        
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.markdown('<div class="section-header">🔗 Or Enter URL Manually</div>', unsafe_allow_html=True)
         manual_url = st.text_input("Paste a URL to analyse", placeholder="https://example.com", label_visibility="collapsed")
@@ -381,7 +352,6 @@ if page == "🔍 Scan QR Code":
 
     with col_result:
 
-        # ── QR File Analysis ──────────────────────────────────────
         if uploaded_file:
             with st.spinner("🔍 Decoding QR code…"):
                 with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
@@ -400,7 +370,6 @@ if page == "🔍 Scan QR Code":
                 for url in urls:
                     _render_analysis(url)
 
-        # ── Manual URL Analysis ───────────────────────────────────
         if manual_btn and manual_url.strip():
             _render_analysis(manual_url.strip())
 
@@ -416,9 +385,7 @@ if page == "🔍 Scan QR Code":
 
 
 
-# =========================
-# PAGE: DASHBOARD
-# =========================
+
 elif page == "📊 Dashboard":
 
     st.markdown("""
@@ -439,7 +406,7 @@ elif page == "📊 Dashboard":
     danger = sum(1 for r in rows if r["risk_category"] == "Dangerous")
     avg_score = round(sum(r["risk_score"] for r in rows) / max(1, total), 1)
 
-    # KPI Row
+    
     k1, k2, k3, k4, k5, k6 = st.columns(6)
     k1.metric("📊 Total Scans",     total)
     k2.metric("🟢 Safe",            safe)
@@ -502,7 +469,7 @@ elif page == "📊 Dashboard":
             st.plotly_chart(fig_line, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-        # Bar chart — score per scan
+      
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.markdown('<div class="section-header">📊 Risk Score Per Scan</div>', unsafe_allow_html=True)
         df["label"] = df["url"].str[:40] + "…"
@@ -530,9 +497,6 @@ elif page == "📊 Dashboard":
         st.info("No scans recorded yet. Go to **Scan QR Code** to get started.")
 
 
-# =========================
-# PAGE: HISTORY
-# =========================
 elif page == "📜 History":
 
     st.markdown("""
@@ -549,14 +513,14 @@ elif page == "📜 History":
     rows = get_all_scans()
 
     if rows:
-        # Search / filter
+     
         search = st.text_input("🔎 Search by URL…", placeholder="Type to filter", label_visibility="collapsed")
         if search:
             rows = [r for r in rows if search.lower() in r["url"].lower()]
 
         df = pd.DataFrame(rows)
 
-        # Colour-coded category column
+       
         def style_category(val):
             c = {"Safe": "#00e676", "Moderate": "#ffb300", "Dangerous": "#ff3d3d"}.get(val, "white")
             return f"color: {c}; font-weight: 600;"
@@ -588,9 +552,7 @@ elif page == "📜 History":
         st.info("No scan history found.")
 
 
-# =========================
-# PAGE: SETTINGS
-# =========================
+
 elif page == "⚙️ Settings":
 
     st.markdown("""
@@ -622,9 +584,7 @@ elif page == "⚙️ Settings":
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-# =========================
-# FOOTER
-# =========================
+
 st.markdown("""
 <div style='text-align:center; padding: 40px 0 20px 0; color:#2a3a5a; font-size:0.78rem;'>
     © 2026 Suraksha Drishti &nbsp;|&nbsp; AI-Powered Cybersecurity Platform
