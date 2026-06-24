@@ -1,13 +1,10 @@
-# risk_engine.py — Advanced Risk Analysis Engine
-# LOCATION: app/risk_engine.py
+
 import re
 import logging
 
 logger = logging.getLogger(__name__)
 
-# =========================
-# CONFIGURABLE WEIGHTS
-# =========================
+
 RISK_WEIGHTS = {
     "is_https": {
         "weight": 25,
@@ -41,9 +38,7 @@ RISK_WEIGHTS = {
     },
 }
 
-# =========================
-# CATEGORY LOGIC
-# =========================
+
 THRESHOLDS = {"Safe": 30, "Moderate": 60}
 
 def get_risk_category(score: int) -> str:
@@ -54,9 +49,6 @@ def get_risk_category(score: int) -> str:
     return "Dangerous"
 
 
-# =========================
-# MAIN SCORING FUNCTION
-# =========================
 def calculate_risk_score(features: dict) -> dict:
     """
     Calculates a 0-100 risk score from a feature dict.
@@ -68,25 +60,24 @@ def calculate_risk_score(features: dict) -> dict:
     for feature, config in RISK_WEIGHTS.items():
         val = features.get(feature)
 
-        # HTTPS: penalise when False
         if feature == "is_https":
             if not val:
                 score += config["weight"]
                 reasons.append(config["reason"])
 
-        # Keyword list: penalise when non-empty
+        
         elif feature == "suspicious_keywords_found":
             if val:
                 score += config["weight"]
                 reasons.append(config["reason"].format(values=", ".join(val)))
 
-        # Threshold-based numeric features
+        
         elif "threshold" in config:
             if isinstance(val, (int, float)) and val > config["threshold"]:
                 score += config["weight"]
                 reasons.append(config["reason"])
 
-        # Standard boolean features
+
         elif val is True:
             score += config["weight"]
             reasons.append(config["reason"])
@@ -100,9 +91,7 @@ def calculate_risk_score(features: dict) -> dict:
     }
 
 
-# =========================
-# HIGH-LEVEL WRAPPER (used by main.py)
-# =========================
+
 def analyze_url(url: str) -> dict:
     """
     Lightweight wrapper used by the Streamlit UI.
